@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horologix | Timeless Elegance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            scroll-behavior: smooth;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .watch-card:hover .watch-image {
+            transform: scale(1.05);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gold-gradient {
+            background: linear-gradient(45deg, #d4af37, #f9e29c, #b8860b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-enter {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        input {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            border-radius: 12px !important;
+        }
+
+        input:focus {
+            border-color: #d4af37 !important;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .rounded-luxury { border-radius: 24px; }
+        .rounded-button { border-radius: 14px; }
+
+        /* Smooth hover transition for buttons */
+        .add-to-cart-btn, .explore-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 glass rounded-2xl">
+        <div class="px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i data-lucide="watch" class="text-yellow-500 w-5 h-5"></i>
+                <span class="text-xl font-serif font-bold tracking-widest uppercase">Horologix</span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-xs uppercase tracking-widest font-light">
+                <a href="#collections" class="hover:text-yellow-500 transition-colors">Collections</a>
+                <a href="#heritage" class="hover:text-yellow-500 transition-colors">Heritage</a>
+            </div>
+
+            <div class="flex items-center gap-4 md:gap-6">
+                <!-- User Profile / Login -->
+                <div id="user-nav-zone" class="flex items-center gap-4">
+                    <button onclick="openAuthModal()" id="login-nav-btn" class="text-[10px] uppercase tracking-widest hover:text-yellow-500 transition-colors">Login</button>
+                    <div id="user-profile-display" class="hidden flex items-center gap-2 border-l border-white/10 pl-4">
+                        <span id="user-name-abbr" class="w-7 h-7 bg-yellow-600 rounded-full flex items-center justify-center text-[10px] font-bold">JD</span>
+                        <button onclick="logout()" class="text-gray-500 hover:text-white"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+
+                <button onclick="toggleCart()" class="relative hover:text-yellow-500 transition-colors">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    <span id="cart-badge" class="absolute -top-1.5 -right-1.5 bg-yellow-600 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeAuthModal()"></div>
+        <div class="relative bg-zinc-900 border border-white/10 p-8 max-w-md w-full rounded-luxury modal-enter">
+            <div id="auth-login-view">
+                <h2 class="text-3xl font-serif mb-2">Welcome Back</h2>
+                <p class="text-gray-400 text-sm mb-8 font-light">Access your exclusive collection and orders.</p>
+                
+                <form onsubmit="handleAuthAction(event, 'login')" class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-gray-500 ml-1">Email or Phone</label>
+                        <input type="text" id="auth-identifier" required class="w-full p-3.5 text-sm" placeholder="alex@example.com">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-gray-500 ml-1">Password</label>
+                        <input type="password" required class="w-full p-3.5 text-sm" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 py-4 uppercase tracking-widest text-xs font-bold transition-all rounded-button mt-4">Sign In</button>
+                </form>
+                <p class="mt-6 text-center text-xs text-gray-500">
+                    New to Horologix? <button onclick="toggleAuthView()" class="text-yellow-600 hover:underline">Create an account</button>
+                </p>
+            </div>
+
+            <div id="auth-signup-view" class="hidden">
+                <h2 class="text-3xl font-serif mb-2">Join Horologix</h2>
+                <p class="text-gray-400 text-sm mb-8 font-light">Experience the pinnacle of fine watchmaking.</p>
+                
+                <form onsubmit="handleAuthAction(event, 'signup')" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase tracking-widest text-gray-500">First Name</label>
+                            <input type="text" id="signup-name" required class="w-full p-3.5 text-sm">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase tracking-widest text-gray-500">Last Name</label>
+                            <input type="text" required class="w-full p-3.5 text-sm">
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-gray-500">Email Address</label>
+                        <input type="email" id="signup-email" required class="w-full p-3.5 text-sm">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase tracking-widest text-gray-500">Create Password</label>
+                        <input type="password" required class="w-full p-3.5 text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 py-4 uppercase tracking-widest text-xs font-bold transition-all rounded-button mt-4">Register</button>
+                </form>
+                <p class="mt-6 text-center text-xs text-gray-500">
+                    Already a member? <button onclick="toggleAuthView()" class="text-yellow-600 hover:underline">Sign in</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-black/60 z-10"></div>
+            <img src="https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?auto=format&fit=crop&q=80&w=1920" alt="Hero Watch" class="w-full h-full object-cover">
+        </div>
+        <div class="relative z-20 text-center px-4 max-w-4xl">
+            <h1 class="text-5xl md:text-8xl font-serif mb-6 leading-tight">Crafting <span class="gold-gradient italic font-normal">History</span></h1>
+            <p class="text-lg md:text-xl font-light text-gray-300 mb-10 max-w-2xl mx-auto">Luxury timepieces blending Swiss precision with modern elegance.</p>
+            <div class="flex gap-4 justify-center">
+                <a href="#collections" class="explore-btn bg-yellow-600 hover:bg-white hover:text-black px-10 py-4 uppercase tracking-widest text-sm font-bold rounded-button text-white">Explore</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Heritage Section -->
+    <section id="heritage" class="py-24 px-6 max-w-7xl mx-auto border-b border-white/5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div class="order-2 md:order-1">
+                <h2 class="text-sm uppercase tracking-[0.3em] text-yellow-600 mb-4">Our Legacy</h2>
+                <h3 class="text-4xl md:text-6xl font-serif mb-8 leading-tight">A Century of <br>Unrivaled Precision</h3>
+                <p class="text-gray-400 font-light leading-relaxed mb-8">
+                    Founded in the heart of the Swiss Jura Mountains in 1924, Horologix has remained at the vanguard of horological innovation. Every component is meticulously hand-finished, ensuring that each timepiece is not just a tool, but a legacy passed through generations.
+                </p>
+                <div class="flex gap-8">
+                    <div>
+                        <p class="text-2xl font-serif">100+</p>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-500">Years of Craft</p>
+                    </div>
+                    <div class="w-px h-12 bg-white/10"></div>
+                    <div>
+                        <p class="text-2xl font-serif">Swiss</p>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-500">Certified Origin</p>
+                    </div>
+                </div>
+            </div>
+            <div class="order-1 md:order-2">
+                <div class="relative rounded-luxury overflow-hidden aspect-square glass">
+                    <img src="https://images.unsplash.com/photo-1585123334904-845d60e97b29?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-700" alt="Watchmaking heritage">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Collections -->
+    <section id="collections" class="py-24 px-6 max-w-7xl mx-auto">
+        <div class="mb-16 text-center">
+            <h2 class="text-sm uppercase tracking-[0.3em] text-yellow-600 mb-2">The Collection</h2>
+            <h3 class="text-4xl font-serif">Curated Masterpieces</h3>
+        </div>
+        <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"></div>
+    </section>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed inset-0 z-[60] invisible transition-all">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleCart()"></div>
+        <div class="absolute right-4 top-4 bottom-4 w-full max-w-md bg-zinc-900/90 backdrop-blur-md shadow-2xl p-8 transform translate-x-full transition-transform duration-500 flex flex-col rounded-3xl border border-white/10" id="cart-content">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-serif">Your Selection</h2>
+                <button onclick="toggleCart()"><i data-lucide="x"></i></button>
+            </div>
+            <div id="cart-items" class="space-y-6 flex-1 overflow-y-auto no-scrollbar"></div>
+            <div class="mt-auto pt-8 border-t border-white/5">
+                <div class="flex justify-between mb-6">
+                    <span class="text-gray-400 uppercase tracking-widest text-sm">Total</span>
+                    <span id="cart-total" class="text-xl font-serif text-yellow-500">$0.00</span>
+                </div>
+                <button onclick="attemptCheckout()" class="w-full bg-yellow-600 hover:bg-yellow-700 py-4 uppercase tracking-widest text-sm font-bold transition-all rounded-button" id="checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-xl" onclick="closeCheckout()"></div>
+        <div class="relative bg-zinc-900 border border-white/10 p-6 md:p-10 max-w-2xl w-full max-h-[90vh] overflow-y-auto no-scrollbar modal-enter rounded-luxury">
+            <div id="checkout-form-container">
+                <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
+                    <h2 class="text-2xl font-serif">Secure Checkout</h2>
+                    <span id="checkout-total-display" class="text-yellow-600 font-serif text-xl"></span>
+                </div>
+                <form id="order-form" onsubmit="handleOrderSubmission(event)" class="space-y-8">
+                    <div class="space-y-4">
+                        <h3 class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Shipping Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="checkout-full-name" placeholder="Full Name" required class="w-full p-3.5 text-sm">
+                            <input type="email" id="checkout-email" placeholder="Email Address" required class="w-full p-3.5 text-sm">
+                            <input type="text" placeholder="Shipping Address" required class="w-full p-3.5 text-sm md:col-span-2">
+                        </div>
+                    </div>
+                    <div class="space-y-4 pt-4 border-t border-white/5">
+                        <h3 class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Payment Details</h3>
+                        <div class="space-y-4">
+                            <input type="text" placeholder="Card Number" required class="w-full p-3.5 text-sm">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="text" placeholder="MM/YY" required class="p-3.5 text-sm">
+                                <input type="text" placeholder="CVC" required class="p-3.5 text-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" id="submit-order-btn" class="w-full bg-yellow-600 py-4 uppercase tracking-widest text-sm font-bold rounded-button">Complete Purchase</button>
+                </form>
+            </div>
+            <div id="checkout-success" class="hidden text-center py-10">
+                <i data-lucide="check-circle" class="w-16 h-16 text-green-500 mx-auto mb-6"></i>
+                <h2 class="text-3xl font-serif mb-4">Order Confirmed</h2>
+                <button onclick="closeCheckout()" class="border border-white/20 px-10 py-4 uppercase tracking-widest text-xs rounded-button">Return Home</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 right-10 z-[100] translate-y-20 opacity-0 transition-all duration-500">
+        <div class="glass px-6 py-4 flex items-center gap-3 rounded-2xl shadow-2xl">
+            <span id="toast-message" class="text-sm font-medium"></span>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: "Celestial Chrono", price: 12500, category: "Chronograph", image: "https://images.unsplash.com/photo-1548171916-c0ea98696759?auto=format&fit=crop&q=80&w=800" },
+            { id: 2, name: "Oceanic Depth", price: 8900, category: "Diver", image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&q=80&w=800" },
+            { id: 3, name: "Midnight Skeleton", price: 21000, category: "Classic", image: "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?auto=format&fit=crop&q=80&w=800" }
+        ];
+
+        let cart = [];
+        let currentUser = null;
+
+        function init() {
+            lucide.createIcons();
+            renderProducts();
+            updateCart();
+            checkPersistedAuth();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = products.map(product => `
+                <div class="watch-card group">
+                    <div class="relative overflow-hidden mb-6 aspect-[4/5] glass rounded-luxury">
+                        <img src="${product.image}" class="watch-image w-full h-full object-cover transition-all duration-700 opacity-80 group-hover:opacity-100" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800'">
+                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button onclick="addToCart(${product.id})" class="add-to-cart-btn bg-white text-black hover:bg-yellow-500 hover:text-black px-8 py-3.5 text-xs uppercase tracking-widest font-bold rounded-button">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-start px-2">
+                        <div>
+                            <span class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-1.5 block">${product.category}</span>
+                            <h4 class="text-xl font-serif">${product.name}</h4>
+                        </div>
+                        <p class="text-lg font-light text-yellow-600">$${product.price.toLocaleString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- AUTH LOGIC ---
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById('auth-modal').classList.add('flex');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+            document.getElementById('auth-modal').classList.remove('flex');
+        }
+
+        function toggleAuthView() {
+            document.getElementById('auth-login-view').classList.toggle('hidden');
+            document.getElementById('auth-signup-view').classList.toggle('hidden');
+        }
+
+        function handleAuthAction(e, type) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin w-4 h-4 mx-auto"></i>';
+            lucide.createIcons();
+
+            setTimeout(() => {
+                if (type === 'login') {
+                    const id = document.getElementById('auth-identifier').value;
+                    currentUser = { name: id.split('@')[0], email: id };
+                } else {
+                    const name = document.getElementById('signup-name').value;
+                    const email = document.getElementById('signup-email').value;
+                    currentUser = { name: name, email: email };
+                }
+                updateAuthUI();
+                closeAuthModal();
+                showToast(`Welcome, ${currentUser.name}`);
+                btn.innerText = originalText;
+            }, 1200);
+        }
+
+        function updateAuthUI() {
+            const loginBtn = document.getElementById('login-nav-btn');
+            const profile = document.getElementById('user-profile-display');
+            const abbr = document.getElementById('user-name-abbr');
+
+            if (currentUser) {
+                loginBtn.classList.add('hidden');
+                profile.classList.remove('hidden');
+                abbr.innerText = currentUser.name.substring(0, 2).toUpperCase();
+                
+                if (document.getElementById('checkout-full-name')) {
+                    document.getElementById('checkout-full-name').value = currentUser.name;
+                    document.getElementById('checkout-email').value = currentUser.email;
+                }
+            } else {
+                loginBtn.classList.remove('hidden');
+                profile.classList.add('hidden');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            updateAuthUI();
+            showToast("Logged out successfully");
+        }
+
+        function checkPersistedAuth() {
+            updateAuthUI();
+        }
+
+        // --- CART & CHECKOUT ---
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const content = document.getElementById('cart-content');
+            if (sidebar.classList.contains('invisible')) {
+                sidebar.classList.remove('invisible');
+                content.classList.remove('translate-x-full');
+            } else {
+                content.classList.add('translate-x-full');
+                setTimeout(() => sidebar.classList.add('invisible'), 500);
+            }
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            cart.push(product);
+            updateCart();
+            showToast(`Added to selection`);
+        }
+
+        function updateCart() {
+            const badge = document.getElementById('cart-badge');
+            const itemsContainer = document.getElementById('cart-items');
+            const totalContainer = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            badge.innerText = cart.length;
+            badge.classList.toggle('hidden', cart.length === 0);
+            checkoutBtn.disabled = cart.length === 0;
+
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = '<p class="text-gray-500 text-center py-10 italic">Empty selection</p>';
+            } else {
+                itemsContainer.innerHTML = cart.map((item, index) => `
+                    <div class="flex gap-4 items-center bg-white/5 p-3 rounded-2xl border border-white/5">
+                        <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg">
+                        <div class="flex-1">
+                            <h5 class="text-xs font-serif">${item.name}</h5>
+                            <p class="text-yellow-600 text-[10px]">$${item.price.toLocaleString()}</p>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-gray-500 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            totalContainer.innerText = `$${total.toLocaleString()}.00`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function attemptCheckout() {
+            if (!currentUser) {
+                toggleCart();
+                showToast("Please login to proceed to checkout");
+                setTimeout(openAuthModal, 500);
+            } else {
+                openCheckout();
+            }
+        }
+
+        function openCheckout() {
+            if (cart.length === 0) return;
+            toggleCart();
+            document.getElementById('checkout-modal').classList.remove('hidden');
+            document.getElementById('checkout-modal').classList.add('flex');
+            document.getElementById('checkout-form-container').classList.remove('hidden');
+            document.getElementById('checkout-success').classList.add('hidden');
+            
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('checkout-total-display').innerText = `$${total.toLocaleString()}.00`;
+            
+            if (currentUser) {
+                document.getElementById('checkout-full-name').value = currentUser.name;
+                document.getElementById('checkout-email').value = currentUser.email;
+            }
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+            document.getElementById('checkout-modal').classList.remove('flex');
+        }
+
+        function handleOrderSubmission(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-order-btn');
+            btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin w-5 h-5 mx-auto"></i>';
+            
+            setTimeout(() => {
+                document.getElementById('checkout-form-container').classList.add('hidden');
+                document.getElementById('checkout-success').classList.remove('hidden');
+                cart = [];
+                updateCart();
+                lucide.createIcons();
+            }, 2000);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
